@@ -89,6 +89,8 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('romanize', romanize, pass_args=True))
     dispatcher.add_handler(CommandHandler('english', english, pass_args=True))
+    dispatcher.add_handler(CommandHandler('English', english, pass_args=True))
+    dispatcher.add_handler(CommandHandler('Korean', korean, pass_args=True))
     dispatcher.add_handler(CommandHandler('korean', korean, pass_args=True))
     dispatcher.add_handler(CommandHandler('help', help))
     

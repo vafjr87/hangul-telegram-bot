@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import romanizator as roman
 import logging
-import sys
+import naver as n
+import pickle
+import romanizator as r
 
 
 def start(bot, update):
@@ -17,53 +18,78 @@ def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text=start_message)
 
 
-def romanize(bot, update, args):
+def romanize(bot, update, args): 
     message = ' '.join(args)
-    r = roman.Romanizator()
+    romanizator = r.Romanizator()
 
-    if (r.has_hangul(message)):
-        message = r.romanize(message)
+    if (romanizator.has_hangul(message)):
+        message = romanizator.romanize(message)
     else:
         message = "There's no hangul in this message 🤔"
 
     bot.send_message(chat_id=update.message.chat_id, text=message)
 
 
-def echo(bot, update):
-    r = roman.Romanizator()
+def translate(source, target, text):
+    naver = n.Naver()
+    return naver.translate(source, target, text)
 
-    if (r.has_hangul(update.message.text)):
-        message = r.romanize(update.message.text)
-        bot.send_message(chat_id=update.message.chat_id, text=message)
+
+def english(bot, update, args):
+    message = ' '.join(args)
+    update.message.reply_text(translate('ko', 'en', message))
+
+
+def korean(bot, update, args):
+    message = ' '.join(args)
+    update.message.reply_text(translate('en', 'ko', message))
+
+
+def echo(bot, update):
+    romanizator = r.Romanizator()
+
+    if (romanizator.has_hangul(update.message.text)):
+        message = romanizator.romanize(update.message.text)
+        update.message.reply_text(message)
 
 
 def unknown(bot, update):
-    text = """Sorry, I didn't understand that! Are you a North Korean spy?! 🇰🇵\nTry /romanize <text>"""
+    text = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵"""                                                                                                                                                     
     bot.send_message(chat_id=update.message.chat_id, text=text)
+
 
 def help(bot, update):
     help_message =  """
 Hello! I am the Hangul Bot! 🇰🇷
 
-What can I help you now? Mmmm..., okay:
+How can I help you now? Mmmm..., okay:
 
-Well... currently I only can romanize Hangul sentences
+Well... currently I understand these commands: 
+    
+    /romanize:  romanize Hangul sentences
+    /korean: translate messages from English to Korean
+    /english: translate messages from Korean to English
 
-Send me any message with Hangul within and I'll handle it (with /romanize in groups)
+If you send me any message with Hangul, I will romanize it.
 
 Wait for news!
 
-If you have any questions or suggestions, send @vafjr87 a message."""
-
+If you have any questions or suggestions or money to give, send @vafjr87 a message."""
+ 
     bot.send_message(chat_id=update.message.chat_id, text=help_message)
 
 
 if __name__ == '__main__':
-    updater = Updater(token=sys.argv[1])
+    with open('token', 'rb') as token:
+        token = pickle.load(token)
+
+    updater = Updater(token=token.get('telegram'))
     dispatcher = updater.dispatcher
 
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('romanize', romanize, pass_args=True))
+    dispatcher.add_handler(CommandHandler('english', english, pass_args=True))
+    dispatcher.add_handler(CommandHandler('korean', korean, pass_args=True))
     dispatcher.add_handler(CommandHandler('help', help))
     
     dispatcher.add_handler(MessageHandler(Filters.text, echo))

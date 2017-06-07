@@ -11,6 +11,7 @@ class Naver(object):
         'encyc': 'https://openapi.naver.com/v1/search/encyc',
         'voice': 'https://openapi.naver.com/v1/voice/tts.bin'
         }
+        
 
     def translate(self, source, target, text):
         """Translation using Naver API"""

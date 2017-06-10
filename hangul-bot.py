@@ -73,22 +73,22 @@ How can I help you now?
 
 Currently I understand these commands: 
 
-    Translations (powered by Naver®):
+Translations (powered by Naver®):
 
-    /korean <message>: 🇺🇸 → 🇰🇷 
-    /english <message>:  🇰🇷 → 🇺🇸
-    /korean_chinese <message>: 🇰🇷 → 🇨🇳
-    /chinese_korean <message>: 🇨🇳→ 🇰🇷
+/korean <text>: 🇺🇸 → 🇰🇷 
+/english <text>:  🇰🇷 → 🇺🇸
+/korean_chinese <text>: 🇰🇷 → 🇨🇳
+/chinese_korean <text>: 🇨🇳→ 🇰🇷
 
-    Other commands:
+Other commands:
 
-    /romanize <message>:  romanize Hangul sentences
+/romanize <text>:  romanize Hangul sentences
 
-If you send me any message with Hangul, I will romanize it.
+If you send me any text within Hangul, I will romanize it.
 
 Wait for news!
 
-If you have any questions or suggestions or money to give 💰, send @vafjr87 a ping."""
+If you have any questions or suggestions or money to give 💰, ping @vafjr87."""
  
     bot.send_message(chat_id=update.message.chat_id, text=help_message)
 

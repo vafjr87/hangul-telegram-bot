@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -10,7 +10,7 @@ import romanizator as r
 
 def start(bot, update):
     start_message =  "🇰🇷 Welcome to the Hangul Bot 🇰🇷\n\n"
-    start_message += "I can help you with romanization and translations\n"
+    start_message += "I can help you with romanization and translations\n\n\n"
     start_message += "🇰🇷 한글봇에 오신걸 환영합니다 🇰🇷\n\n"
     start_message += "제가 로마자 표기법과 통역을 도와 드릴수 있어요!\n"
     bot.send_message(chat_id=update.message.chat_id, text=start_message)
@@ -61,31 +61,34 @@ def echo(bot, update):
 
 
 def unknown(bot, update):
-    text = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵"""                                                                                                                                                     
+    text = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵\https://youtu.be/EFwitVDo540"""                                                                                                                                                     
     bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
 def help(bot, update):
-    help_message =  """
+    help_message = """
 Hello! I am the Hangul Bot! 🇰🇷
 
-How can I help you now? Mmmm..., okay:
+How can I help you now?
 
-Well... currently I understand these commands: 
-    
-    /romanize:  romanize Hangul sentences
+Currently I understand these commands: 
 
-    translations (powered by Naver®):
-    /korean: 🇺🇸 → 🇰🇷 
-    /english:  🇰🇷 → 🇺🇸
-    /korean_chinese: 🇰🇷 → 🇨🇳
-    /chinese_korean: 🇨🇳→ 🇰🇷
+    Translations (powered by Naver®):
+
+    /korean <message>: 🇺🇸 → 🇰🇷 
+    /english <message>:  🇰🇷 → 🇺🇸
+    /korean_chinese <message>: 🇰🇷 → 🇨🇳
+    /chinese_korean <message>: 🇨🇳→ 🇰🇷
+
+    Other commands:
+
+    /romanize <message>:  romanize Hangul sentences
 
 If you send me any message with Hangul, I will romanize it.
 
 Wait for news!
 
-If you have any questions or suggestions or money to give 💰, send @vafjr87 a message."""
+If you have any questions or suggestions or money to give 💰, send @vafjr87 a ping."""
  
     bot.send_message(chat_id=update.message.chat_id, text=help_message)
 
@@ -113,5 +116,6 @@ if __name__ == '__main__':
     dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    print('Hangul Bot is running! Hooray! 🤗')
+    print('@hangul_bot is running! 한글 봇 만세! ')
     updater.start_polling()
+    updater.idle()

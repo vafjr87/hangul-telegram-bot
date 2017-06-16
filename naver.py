@@ -26,7 +26,7 @@ class Naver(object):
             data = response.json()
             return data.get('message').get('result').get('translatedText')
         else:
-            print('Error code: {}'.format(response.status_code))
+            print('Error code: {}\n{}'.format(response.status_code, response.json()))
 
 
 if __name__ == '__main__':

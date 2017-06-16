@@ -9,14 +9,14 @@ import romanizator as r
 
 
 def start(bot, update):
-    start_message =  "🇰🇷 Welcome to the Hangul Bot 🇰🇷\n\n"
+    start_message = "🇰🇷 Welcome to the Hangul Bot 🇰🇷\n\n"
     start_message += "I can help you with romanization and translations\n\n\n"
     start_message += "🇰🇷 한글봇에 오신걸 환영합니다 🇰🇷\n\n"
     start_message += "제가 로마자 표기법과 통역을 도와 드릴수 있어요!\n"
     bot.send_message(chat_id=update.message.chat_id, text=start_message)
 
 
-def romanize(bot, update, args): 
+def romanize(bot, update, args):
     message = ' '.join(args)
     romanizator = r.Romanizator()
 
@@ -47,6 +47,7 @@ def chinese_korean(bot, update, args):
     message = ' '.join(args)
     update.message.reply_text(translate('zh-CN', 'ko', message))
 
+
 def korean_chinese(bot, update, args):
     message = ' '.join(args)
     update.message.reply_text(translate('ko', 'zh-CN', message))
@@ -61,7 +62,8 @@ def echo(bot, update):
 
 
 def unknown(bot, update):
-    text = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵\https://youtu.be/EFwitVDo540"""                                                                                                                                                     
+    text = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵\
+    \nhttps://youtu.be/EFwitVDo540"""
     bot.send_message(chat_id=update.message.chat_id, text=text)
 
 
@@ -71,11 +73,11 @@ Hello! I am the Hangul Bot! 🇰🇷
 
 How can I help you now?
 
-Currently I understand these commands: 
+Currently I understand these commands:
 
 Translations (powered by Naver®):
 
-/korean <text>: 🇺🇸 → 🇰🇷 
+/korean <text>: 🇺🇸 → 🇰🇷
 /english <text>:  🇰🇷 → 🇺🇸
 /korean_chinese <text>: 🇰🇷 → 🇨🇳
 /chinese_korean <text>: 🇨🇳→ 🇰🇷
@@ -89,7 +91,7 @@ If you send me any text within Hangul, I will romanize it.
 Wait for news!
 
 If you have any questions or suggestions or money to give 💰, ping @vafjr87."""
- 
+
     bot.send_message(chat_id=update.message.chat_id, text=help_message)
 
 
@@ -111,7 +113,7 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('korean_chinese', korean_chinese, pass_args=True))
     dispatcher.add_handler(CommandHandler('Korean_chinese', korean_chinese, pass_args=True))
     dispatcher.add_handler(CommandHandler('help', help))
-    
+
     dispatcher.add_handler(MessageHandler(Filters.text, echo))
     dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 

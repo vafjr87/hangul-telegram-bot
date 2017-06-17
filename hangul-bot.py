@@ -7,12 +7,24 @@ import naver as n
 import pickle
 import romanizator as r
 
+lang_errors = {
+    'ko': {
+        'en': 'Use /english <message>',
+        'zh-CN': 'Use /korean_chinese <message>'
+    },
+    'en': {'ko': 'Use /korean <message>'},
+    'zh-CN': {'ko': 'Use /chinese_korean <message>',
+    'romanize': 'Use /romanize <message>'}
+}
+
 
 def start(bot, update):
     start_message = "🇰🇷 Welcome to the Hangul Bot 🇰🇷\n\n"
     start_message += "I can help you with romanization and translations\n\n\n"
-    start_message += "🇰🇷 한글봇에 오신걸 환영합니다 🇰🇷\n\n"
-    start_message += "제가 로마자 표기법과 통역을 도와 드릴수 있어요!\n"
+    # start_message += "🇰🇷 한글봇에 오신걸 환영합니다 🇰🇷\n\n"
+    # start_message += "제가 로마자 표기법과 통역을 도와 드릴수 있어요!\n"
+    print(update)
+    dir(update)
     bot.send_message(chat_id=update.message.chat_id, text=start_message)
 
 
@@ -20,15 +32,21 @@ def romanize(bot, update, args):
     message = ' '.join(args)
     romanizator = r.Romanizator()
 
-    if (romanizator.has_hangul(message)):
-        message = romanizator.romanize(message)
+    if message == '':
+        message = lang_errors['romanize']
     else:
-        message = "There's no hangul in this message 🤔"
+        if (romanizator.has_hangul(message)):
+            message = romanizator.romanize(message)
+        else:
+            message = "There's no hangul in this message 🤔"
 
     bot.send_message(chat_id=update.message.chat_id, text=message)
 
 
 def translate(source, target, text):
+    if text == '':
+        return lang_errors[source][target]
+
     naver = n.Naver()
     return naver.translate(source, target, text)
 

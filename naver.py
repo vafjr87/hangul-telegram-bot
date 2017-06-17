@@ -15,6 +15,9 @@ class Naver(object):
 
     def translate(self, source, target, text):
         """Translation using Naver API"""
+        if text == '':
+            return ''
+
         with open('token', 'rb') as token:
             token = pickle.load(token)
 

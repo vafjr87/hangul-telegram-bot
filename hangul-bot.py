@@ -8,15 +8,18 @@ import logging
 import naver as n
 import pickle
 import romanizator as r
+import telegram
 
 command_errors = {
     'ko': {
-        'en': 'Use /english <text>',
-        'zh-CN': 'Use /korean_chinese <text>'
+        'en': 'Use /english <i>text</i>',
+        'zh-CN': 'Use /korean_chinese <i>text</i>'
     },
-    'en': {'ko': 'Use /korean <text>'},
-    'zh-CN': {'ko': 'Use /chinese_korean <text>',
-    'romanize': 'Use /romanize <text>'}
+    'en': {'ko': 'Use /korean <i>text</i>'},
+    'zh-CN': {'ko': 'Use /chinese_korean <i>text</i>'},
+    'romanize': 'Use /romanize <i>text</i>',
+    'none': 'Sorry. I failed. Please try again!',
+    'no_hangul': "There's no hangul in this message 🤔"
 }
 
 
@@ -32,11 +35,14 @@ def error(bot, update, error):
 
 def start(bot, update):
     botlog.log_activity(update)
-    start_message = "🇰🇷 Welcome to the Hangul Bot, {} 🇰🇷\n\n".format(update.message.chat.first_name)
-    start_message += "I can help you with romanization and translations!\n\n\n"
-    # start_message += "🇰🇷 한글봇에 오신걸 환영합니다 🇰🇷\n\n"
-    # start_message += "제가 로마자 표기법과 통역을 도와 드릴수 있어요!\n"
-    bot.send_message(chat_id=update.message.chat_id, text=start_message)
+    start_message = "🇰🇷 Welcome to the <i>Hangul Bot</i>, {} 🇰🇷\n\n".format(update.message.chat.first_name)
+    start_message += "I can help you with <b>translations</b> and <b>romanization!</b>\n"
+    start_message += "Press /help to learn my commands\n\n\n"
+    start_message += "🇰🇷 <i>한글봇</i>에 오신걸 환영합니다 🇰🇷\n\n"
+    start_message += "<b>번역</b>과 <b>로마자 표기법</b>을 도와 드릴수 있어요!\n"
+    start_message += "커맨드를 보실려면 /help 를 눌러주세요."
+    bot.send_message(chat_id=update.message.chat_id, text=start_message,
+        parse_mode=telegram.ParseMode.HTML)
 
 
 def romanize(bot, update, args):
@@ -45,46 +51,69 @@ def romanize(bot, update, args):
     romanizator = r.Romanizator()
 
     if message == '':
-        message = command_errors['romanize']
+        result = {'message': command_errors['romanize'], 'parse': telegram.ParseMode.HTML}
     else:
         if (romanizator.has_hangul(message)):
-            message = romanizator.romanize(message)
+            result = {'message': romanizator.romanize(message)}
         else:
-            message = "There's no hangul in this message 🤔"
+            result = {'message': command_errors['no_hangul']}
 
-    update.message.reply_text(message, quote=True)
+    if result.get('parse'):
+        update.message.reply_text(result['message'], quote=True, parse_mode=result['parse'])
+    else:
+        update.message.reply_text(result['message'], quote=True)
 
 
 def translate(source, target, text):
     if text == '':
-        return command_errors[source][target]
+        return {'message': command_errors[source][target], 'parse': telegram.ParseMode.HTML}
 
     naver = n.Naver()
-    return naver.translate(source, target, text)
+    result = naver.translate(source, target, text)
+    if result is not None:
+        return {'message': result}
+    else:
+        return {'message': command_errors['none']}
 
 
 def english(bot, update, args):
     botlog.log_activity(update)
     message = ' '.join(args)
-    update.message.reply_text(translate('ko', 'en', message), quote=True)
+    result = translate('ko', 'en', message)
+    if result.get('parse'):
+        update.message.reply_text(result['message'], quote=True, parse_mode=result['parse'])
+    else:
+        update.message.reply_text(result['message'], quote=True)
 
 
 def korean(bot, update, args):
     botlog.log_activity(update)
     message = ' '.join(args)
-    update.message.reply_text(translate('en', 'ko', message), quote=True)
+    result = translate('en', 'ko', message)
+    if result.get('parse'):
+        update.message.reply_text(result['message'], quote=True, parse_mode=result['parse'])
+    else:
+        update.message.reply_text(result['message'], quote=True)
 
 
 def chinese_korean(bot, update, args):
     botlog.log_activity(update)
     message = ' '.join(args)
-    update.message.reply_text(translate('zh-CN', 'ko', message), quote=True)
+    result = translate('zh-CN', 'ko', message)
+    if result.get('parse'):
+        update.message.reply_text(result['message'], quote=True, parse_mode=result['parse'])
+    else:
+        update.message.reply_text(result['message'], quote=True)
 
 
 def korean_chinese(bot, update, args):
     botlog.log_activity(update)
     message = ' '.join(args)
-    update.message.reply_text(translate('ko', 'zh-CN', message), quote=True)
+    result = translate('ko', 'zh-CN', message)
+    if result.get('parse'):
+        update.message.reply_text(result['message'], quote=True, parse_mode=result['parse'])
+    else:
+        update.message.reply_text(result['message'], quote=True)
 
 
 def echo(bot, update):
@@ -92,15 +121,18 @@ def echo(bot, update):
     romanizator = r.Romanizator()
 
     if (romanizator.has_hangul(update.message.text)):
-        message = romanizator.romanize(update.message.text)
-        update.message.reply_text(message, quote=True)
+        result = translate('ko', 'en', update.message.text)
+    else:
+        result = translate('en', 'ko', update.message.text)
+
+    update.message.reply_text(result['message'], quote=True)
 
 
 def unknown(bot, update):
     botlog.log_activity(update)
-    message = """Sorry, I didn't understand your command! Are you a North Korean spy?! 🇰🇵\
+    message = """Sorry, I didn't understand your command! Are you a <b>North Korean spy?!</b> 🇰🇵\
     \n\nhttps://youtu.be/EFwitVDo540"""
-    update.message.reply_text(message, quote=True)
+    update.message.reply_text(message, quote=True, parse_mode=telegram.ParseMode.HTML)
 
 
 def help(bot, update):
@@ -114,22 +146,22 @@ Currently I understand these commands:
 
 Translations (powered by Naver®):
 
-/korean <text>: 🇺🇸 → 🇰🇷
-/english <text>:  🇰🇷 → 🇺🇸
-/korean_chinese <text>: 🇰🇷 → 🇨🇳
-/chinese_korean <text>: 🇨🇳→ 🇰🇷
+/korean <i>text:</i> 🇺🇸 → 🇰🇷
+/english <i>text:</i>  🇰🇷 → 🇺🇸
+/korean_chinese <i>text:</i> 🇰🇷 → 🇨🇳
+/chinese_korean <i>text:</i> 🇨🇳→ 🇰🇷
 
 Other commands:
 
-/romanize <text>:  romanize Hangul sentences
+/romanize text:  romanize Hangul sentences
 
-If you send me any message within Hangul, I will romanize it.
+If you send me any message within Hangul, I will translate it to English, but, it's an English message, I will translate it to Korean!
 
 Wait for news!
 
 If you have any questions or suggestions – or money to give 💰–, ping my <b>beloved master</b> @vafjr87"""
 
-    update.message.reply_text(message, quote=True)
+    update.message.reply_text(message, quote=True, parse_mode=telegram.ParseMode.HTML)
 
 
 def main():

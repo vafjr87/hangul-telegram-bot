@@ -1,22 +1,28 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+ 
 from datetime import datetime as dt
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-import botlog
+import utils
 import logging
 import naver as n
 import pickle
 import romanizator as r
 import telegram
+import sys
+import os
 
 command_errors = {
     'ko': {
         'en': 'Use /english <i>text</i>',
         'zh-CN': 'Use /korean_chinese <i>text</i>'
     },
-    'en': {'ko': 'Use /korean <i>text</i>'},
-    'zh-CN': {'ko': 'Use /chinese_korean <i>text</i>'},
+    'en': {
+        'ko': 'Use /korean <i>text</i>'
+    },
+    'zh-CN': {
+        'ko': 'Use /chinese_korean <i>text</i>'
+    },
     'romanize': 'Use /romanize <i>text</i>',
     'none': 'Sorry. I failed. Please try again!',
     'no_hangul': "There's no hangul in this message 🤔"
@@ -30,11 +36,11 @@ logger = logging.getLogger(__name__)
 
 
 def error(bot, update, error):
-    logger.warning('Update "%s" caused error "%s"' % (update, error))
+    logger.warning('Hangul Bot: Update "%s" caused error "%s"' % (update, error))
 
 
 def start(bot, update):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     start_message = "🇰🇷 Welcome to the <i>Hangul Bot</i>, {} 🇰🇷\n\n".format(update.message.chat.first_name)
     start_message += "I can help you with <b>translations</b> and <b>romanization!</b>\n"
     start_message += "Press /help to learn my commands\n\n\n"
@@ -46,7 +52,7 @@ def start(bot, update):
 
 
 def romanize(bot, update, args):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = ' '.join(args)
     romanizator = r.Romanizator()
 
@@ -77,7 +83,7 @@ def translate(source, target, text):
 
 
 def english(bot, update, args):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = ' '.join(args)
     result = translate('ko', 'en', message)
     if result.get('parse'):
@@ -87,7 +93,7 @@ def english(bot, update, args):
 
 
 def korean(bot, update, args):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = ' '.join(args)
     result = translate('en', 'ko', message)
     if result.get('parse'):
@@ -97,7 +103,7 @@ def korean(bot, update, args):
 
 
 def chinese_korean(bot, update, args):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = ' '.join(args)
     result = translate('zh-CN', 'ko', message)
     if result.get('parse'):
@@ -107,7 +113,7 @@ def chinese_korean(bot, update, args):
 
 
 def korean_chinese(bot, update, args):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = ' '.join(args)
     result = translate('ko', 'zh-CN', message)
     if result.get('parse'):
@@ -117,7 +123,7 @@ def korean_chinese(bot, update, args):
 
 
 def echo(bot, update):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     romanizator = r.Romanizator()
 
     if (romanizator.has_hangul(update.message.text)):
@@ -129,14 +135,14 @@ def echo(bot, update):
 
 
 def unknown(bot, update):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = """Sorry, I didn't understand your command! Are you a <b>North Korean spy?!</b> 🇰🇵\
     \n\nhttps://youtu.be/EFwitVDo540"""
     update.message.reply_text(message, quote=True, parse_mode=telegram.ParseMode.HTML)
 
 
 def help(bot, update):
-    botlog.log_activity(update)
+    # botlog.log_activity(update)
     message = """
 Hello! I am the Hangul Bot! 🇰🇷
 
@@ -165,22 +171,24 @@ If you have any questions or suggestions – or money to give 💰–, ping my <
 
 
 def main():
-    with open('token', 'rb') as token:
-        token = pickle.load(token)
+    # with open('token', 'rb') as token:
+    #     token = pickle.load(token)
 
-    updater = Updater(token=token.get('telegram'))
+    TELEGRAM_HANGULBOT_TOKEN = os.environ['TELEGRAM_HANGULBOT_TOKEN']
+
+    updater = Updater(token=TELEGRAM_HANGULBOT_TOKEN)
     dp = updater.dispatcher
-    dp.add_handler(CommandHandler('start', start))
-    dp.add_handler(CommandHandler('romanize', romanize, pass_args=True))
-    dp.add_handler(CommandHandler('english', english, pass_args=True))
-    dp.add_handler(CommandHandler('English', english, pass_args=True))
-    dp.add_handler(CommandHandler('Korean', korean, pass_args=True))
-    dp.add_handler(CommandHandler('korean', korean, pass_args=True))
-    dp.add_handler(CommandHandler('chinese_korean', chinese_korean, pass_args=True))
-    dp.add_handler(CommandHandler('Chinese_korean', chinese_korean, pass_args=True))
-    dp.add_handler(CommandHandler('korean_chinese', korean_chinese, pass_args=True))
-    dp.add_handler(CommandHandler('Korean_chinese', korean_chinese, pass_args=True))
-    dp.add_handler(CommandHandler('help', help))
+    # dp.add_handler(CommandHandler('start', start))
+    # dp.add_handler(CommandHandler('romanize', romanize, pass_args=True))
+    # dp.add_handler(CommandHandler('english', english, pass_args=True))
+    # dp.add_handler(CommandHandler('English', english, pass_args=True))
+    # dp.add_handler(CommandHandler('Korean', korean, pass_args=True))
+    # dp.add_handler(CommandHandler('korean', korean, pass_args=True))
+    # dp.add_handler(CommandHandler('chinese_korean', chinese_korean, pass_args=True))
+    # dp.add_handler(CommandHandler('Chinese_korean', chinese_korean, pass_args=True))
+    # dp.add_handler(CommandHandler('korean_chinese', korean_chinese, pass_args=True))
+    # dp.add_handler(CommandHandler('Korean_chinese', korean_chinese, pass_args=True))
+    # dp.add_handler(CommandHandler('help', help))
     dp.add_handler(MessageHandler(Filters.text, echo))
     dp.add_handler(MessageHandler(Filters.command, unknown))
 
